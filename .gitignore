@@ -1,0 +1,12 @@
+# Ignore dotenv file
+.env
+
+# Python virtualenv (if you ever have one in here)
+venv/
+
+# Uvicorn autoreload files
+*.py[cod]
+__pycache__/
+
+# macOS junk
+.DS_Store
