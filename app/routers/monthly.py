@@ -44,3 +44,12 @@ def get_monthly_pick(db: Session = Depends(get_db)):
     if not pick:
         raise HTTPException(status_code=404, detail="No pick set for this month")
     return pick
+
+@router.post("/pick/force", response_model=MonthlyPickOut)
+def force_monthly_pick(db: Session = Depends(get_db)):
+    month_str = date.today().strftime("%Y-%m")
+    # delete any existing for this month
+    db.query(models.MonthlyPick).filter_by(month=month_str).delete()
+    db.commit()
+    # then run the same logic as create_monthly_pick:
+    return create_monthly_pick(db)

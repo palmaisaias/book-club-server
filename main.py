@@ -5,6 +5,9 @@ from app.routers.monthly import router as monthly_router
 from app.routers.auth import router as auth_router, get_current_user
 from app.routers.suggestions import router as suggestions_router
 from fastapi.middleware.cors import CORSMiddleware
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from app.routers.monthly import create_monthly_pick
+from app.db.database import SessionLocal
 
 
 app = FastAPI(title="Sibling Book‑Club API")
@@ -25,6 +28,22 @@ init_db()
 app.include_router(auth_router)
 app.include_router(suggestions_router, dependencies=[Depends(get_current_user)])
 app.include_router(monthly_router, dependencies=[Depends(get_current_user)])
+
+@app.on_event("startup")
+async def start_scheduler():
+    scheduler = AsyncIOScheduler()
+
+    def run_monthly():
+        db = SessionLocal()
+        try:
+            # create or re-create this month's pick
+            create_monthly_pick(db=db)
+        finally:
+            db.close()
+
+    # Schedule to run at 00:00 UTC on the 1st of every month
+    scheduler.add_job(run_monthly, trigger="cron", day="1", hour="0", minute="0")
+    scheduler.start()
 
 if __name__ == "__main__":
     import uvicorn
