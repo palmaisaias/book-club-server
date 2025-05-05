@@ -1,5 +1,5 @@
 import random
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 from app.db.database import SessionLocal
 from app.db import models
@@ -35,3 +35,12 @@ def current_book(db: Session = Depends(get_db)):
     if not all_suggestions:
         raise HTTPException(status_code=404, detail="No suggestions found")
     return random.choice(all_suggestions)
+
+@router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
+def clear_suggestions(db: Session = Depends(get_db)):
+    # delete all book suggestions
+    db.query(models.Suggestion).delete()
+    # optional: also clear the monthly picks
+    db.query(models.MonthlyPick).delete()
+    db.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
