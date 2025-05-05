@@ -4,13 +4,18 @@ from app.db.database import init_db
 from app.routers.monthly import router as monthly_router
 from app.routers.auth import router as auth_router, get_current_user
 from app.routers.suggestions import router as suggestions_router
+from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI(title="Sibling Book‑Club API")
 
 # allow the Vite dev server
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",                       # for local dev
+        "https://book-club-client.vercel.app"    # if needed
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
