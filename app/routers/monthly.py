@@ -47,7 +47,7 @@ def get_monthly_pick(db: Session = Depends(get_db)):
 
 @router.post("/pick/force", response_model=MonthlyPickOut)
 def force_monthly_pick(db: Session = Depends(get_db)):
-    month_str = date.today().strftime("%Y-%m")
+    month_str = datetime.date.today().strftime("%Y-%m")
     # delete any existing for this month
     db.query(models.MonthlyPick).filter_by(month=month_str).delete()
     db.commit()
