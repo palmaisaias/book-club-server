@@ -1,5 +1,5 @@
 from datetime import timedelta
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
@@ -69,3 +69,17 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
+@router.delete(
+    "/clear",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Clear all user accounts"
+)
+def clear_users(db: Session = Depends(get_db)):
+    """
+    Deletes every user in the database.
+    WARNING: Irreversible — removes all accounts.
+    """
+    db.query(models.User).delete()
+    db.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
