@@ -31,10 +31,7 @@ init_db()
 app.include_router(auth_router)
 app.include_router(suggestions_router, dependencies=[Depends(get_current_user)])
 app.include_router(monthly_router, dependencies=[Depends(get_current_user)])
-app.include_router(
-    admin_router,
-    dependencies=[Depends(get_current_user)]
-)
+app.include_router(admin_router, dependencies=[Depends(get_current_user)])
 
 @app.on_event("startup")
 async def start_scheduler():
